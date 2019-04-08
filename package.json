@@ -1,0 +1,67 @@
+{
+  "name": "vuex-up",
+  "version": "0.0.1",
+  "description": "Extends vuex module features",
+  "main": "dist/vuex-up.cjs.js",
+  "module": "dist/vuex-up.esm.js",
+  "browser": "dist/vuex-up.umd.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "dist/",
+    "types/",
+    "es/",
+    "README.md"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist es types",
+    "build-tsc": "tsc",
+    "build-dist": "rollup -c",
+    "build": "npm run clean && npm run build-tsc && npm run build-dist",
+    "test": "mocha 'test/**/*.spec.js' -colors"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hokid/vuex-up.git"
+  },
+  "keywords": [
+    "vuex",
+    "plugin",
+    "vuex-plugin",
+    "vuex-module",
+    "class",
+    "vuex-class",
+    "vuex-mixin",
+    "mixin",
+    "vuex-services",
+    "services",
+    "vuex-up",
+    "up"
+  ],
+  "author": "Kirill Khoroshilov <mr.hokid@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/lodash.isplainobject": "^4.0.6",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^10.12.18",
+    "@types/sinon-chai": "^3.2.2",
+    "chai": "^4.2.0",
+    "mocha": "^6.0.2",
+    "rollup": "^1.9.0",
+    "rollup-plugin-commonjs": "^9.3.4",
+    "rollup-plugin-node-resolve": "^4.2.0",
+    "sinon": "^7.3.1",
+    "sinon-chai": "^3.3.0",
+    "typescript": "^3.2.2",
+    "vue": "^2.6.10",
+    "vuex": "^3.1.0"
+  },
+  "dependencies": {
+    "deepmerge": "^3.2.0",
+    "lodash.isplainobject": "^4.0.6"
+  },
+  "peerDependencies": {
+    "vue": "*",
+    "vuex": "*"
+  }
+}
