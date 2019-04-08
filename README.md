@@ -1,5 +1,5 @@
 <div align="center">
-    <img title="VuexUp Logo" src="https://github.com/Hokid/vuex-up/blob/master/logo.svg">
+    <img title="VuexUp Logo" src="https://raw.githubusercontent.com/Hokid/vuex-up/master/logo.png">
 </div>
 <div align="center">
 Extends <a href="https://github.com/vuejs/vuex">vuex</a> module features
