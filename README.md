@@ -1,5 +1,5 @@
 <div align="center">
-    <img title="VuexUp Logo" src="https://raw.githubusercontent.com/Hokid/vuex-up/master/logo.png" width="270">
+    <img title="VuexUp Logo" src="https://raw.githubusercontent.com/Hokid/vuex-up/master/logo.png" width="270" />
 </div>
 <div align="center">
 Extends <a href="https://github.com/vuejs/vuex">vuex</a> module features
@@ -10,8 +10,8 @@ Extends <a href="https://github.com/vuejs/vuex">vuex</a> module features
 </div>
 <hr/>
 <div align="center">
-    <a href="https://www.npmjs.com/package/vuex-up"><img src="https://img.shields.io/npm/v/vuex-up.svg" alt="Version">
-    <a href="https://www.npmjs.com/package/vuex-up"><img src="https://img.shields.io/npm/types/vuex-up.svg" alt="Typings">
+    <a href="https://www.npmjs.com/package/vuex-up"><img src="https://img.shields.io/npm/v/vuex-up.svg" alt="Version" /></a>
+    <a href="https://www.npmjs.com/package/vuex-up"><img src="https://img.shields.io/npm/types/vuex-up.svg" alt="Typings" /></a>
 </div>
 
 # Install
