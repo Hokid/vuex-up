@@ -1,6 +1,6 @@
 {
   "name": "vuex-up",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Extends vuex module features",
   "main": "dist/vuex-up.cjs.js",
   "module": "dist/vuex-up.esm.js",
