@@ -116,26 +116,32 @@ export function mixModules<State, RootState, Services = any>(
 
 export function injectServices<Services extends AnyServices>(
     method: VuexActionHandler<any, any>,
+    dest: string,
     services: Services
 ): VuexUpActionHandler<any, any, Services>;
 export function injectServices<Services extends AnyServices>(
     method: VuexUpActionHandler<any, any, any>,
+    dest: string,
     services: Services
 ): VuexUpActionHandler<any, any, Services>;
 export function injectServices<Services extends AnyServices>(
     method: VuexMutation<any>,
+    dest: string,
     services: Services
 ): VuexUpMutation<any, Services>;
 export function injectServices<Services extends AnyServices>(
     method: VuexUpMutation<any, any>,
+    dest: string,
     services: Services
 ): VuexUpMutation<any, Services>;
 export function injectServices<Services extends AnyServices>(
     method: VuexGetter<any, any>,
+    dest: string,
     services: Services
 ): VuexUpGetter<any, any, Services>;
 export function injectServices<Services extends AnyServices>(
     method: VuexUpGetter<any, any, any>,
+    dest: string,
     services: Services
 ): VuexUpGetter<any, any, Services>;
 export function injectServices<Services extends AnyServices>(
@@ -147,13 +153,22 @@ export function injectServices<Services extends AnyServices>(
         | VuexGetter<any, any>
         | VuexUpGetter<any, any, any>
     ,
+    dest: string,
     services: Services
 ): VuexUpActionHandler<any, any, Services>
     | VuexUpMutation<any, Services>
     | VuexUpGetter<any, any, Services>
 {
     return function withServices(this: any, ...args: any[]) {
-        args.push(services);
+        // Vuex call action with 3 arguments: `context`, `payload` and `cb`(no referees in docs).
+        // `cb` argument don`t have it`s represent in type definitions and unused at all.
+        // Instead of appending services as last argument we replace `cb` with it.
+        // https://github.com/vuejs/vuex/blob/4c0d0ae0abcd48f1df2c0c263402a94a214168b2/src/store.js#L434
+        if (dest === 'actions') {
+            args[args.length - 1] = services;
+        } else {
+            args.push(services);
+        }
         return (method as any).apply(this, args);
     };
 }

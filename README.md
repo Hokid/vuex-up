@@ -150,7 +150,7 @@ const store = new Vuex.Store({
 <details>
     <summary>Full code:</summary>
 
-[live example](https://jsfiddle.net/mr_hokid/1u96xscm/2/)
+[live example](https://jsfiddle.net/mr_hokid/1u96xscm/3/)
 
 ```javascript
 import Vue from 'vue';

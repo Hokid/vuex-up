@@ -7,15 +7,6 @@ chai.use(require('sinon-chai'));
 
 const {expect} = chai;
 
-const createModule = (partitial) =>
-    Object.assign({
-        state: {},
-        actions: {},
-        mutations: {},
-        getters: {},
-        modules: {},
-        namespaced: false
-    }, partitial);
 const methodsContainers = ['actions', 'mutations', 'getters'];
 const expectModule = (actual, expected) => {
     expect(actual.state, 'state').to.deep.equal(expected.state);
@@ -686,17 +677,17 @@ describe('vuex-up', () => {
     });
 
     describe('.service', () => {
-        it('should provide service to actions as last argument', () => {
+        it('should provide service to actions as last argument(replace `cb` arg)', () => {
             const serviceA = 1;
             const module = vuexUp({
                 actions: {
-                    a(_, services) {
+                    a(context, payload, services) {
                         expect(services.serviceA).to.be.equal(serviceA);
                     }
                 }
             })
                 .service('serviceA', serviceA);
-            module.create().actions.a(void 0);
+            module.create().actions.a(void 0, void 0, void 0);
         });
 
         it('should provide service to getters as last argument', () => {
@@ -727,17 +718,17 @@ describe('vuex-up', () => {
     });
 
     describe('.services', () => {
-        it('should provide services to actions as last argument', () => {
+        it('should provide services to actions as last argument(replace `cb` arg)', () => {
             const serviceA = 1;
             const module = vuexUp({
                 actions: {
-                    a(_, services) {
+                    a(context, payload, services) {
                         expect(services.serviceA).to.be.equal(serviceA);
                     }
                 }
             })
                 .services({serviceA});
-            module.create().actions.a(void 0);
+            module.create().actions.a(void 0, void 0, void 0);
         });
 
         it('should provide services to getters as last argument', () => {

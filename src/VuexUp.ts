@@ -54,10 +54,10 @@ class VuexUp<State, RootState, Services extends AnyServices = {}> {
                     if (isActionObject(treeValue)) {
                         tree[treeKey] = {
                             ...treeValue,
-                            handler: injectServices(treeValue.handler, this._services)
+                            handler: injectServices(treeValue.handler, destKey, this._services)
                         }
                     } else if (isFunction(treeValue)) {
-                        tree[treeKey] = injectServices(treeValue, this._services);
+                        tree[treeKey] = injectServices(treeValue, destKey, this._services);
                     }
                 }
             }
