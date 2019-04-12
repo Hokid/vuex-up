@@ -1,6 +1,6 @@
 {
   "name": "vuex-up",
-  "version": "1.0.5",
+  "version": "0.1.0",
   "description": "Extends vuex module features",
   "main": "dist/vuex-up.cjs.js",
   "module": "dist/vuex-up.esm.js",
@@ -52,7 +52,7 @@
     "rollup-plugin-node-resolve": "^4.2.0",
     "sinon": "^7.3.1",
     "sinon-chai": "^3.3.0",
-    "typescript": "^3.2.2",
+    "typescript": "^3.4.3",
     "vue": "^2.6.10",
     "vuex": "^3.1.0"
   },
