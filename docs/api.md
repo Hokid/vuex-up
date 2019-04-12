@@ -114,7 +114,7 @@ vuexUpInstance
 Extends [VuexModule](https://vuex.vuejs.org/api/#modules)
 
 ```typescript
-interface VuexUpModule {
+interface VuexUpMixin {
     state?: any | (() => any);
     actions?: {
         [key: string]: Function;
@@ -126,7 +126,7 @@ interface VuexUpModule {
         [key: string]: Function;
     },
     modules?: {
-        [key: string]: VuexModule | VuexUpModule;
+        [key: string]: VuexModule | VuexUp;
     }
 }
 ```
@@ -253,7 +253,7 @@ interface MixingOptions {
 Add mixin
 
 ```typescript
-mixin( module: VuexModule | VuexUpModule, mixingOptions: MixingOptions = { state: MixinStrategy.shallow }): VuexUp
+mixin( module: VuexUpMixin, mixingOptions: MixingOptions = { state: MixinStrategy.shallow }): VuexUp
 ```
 
 
@@ -276,11 +276,7 @@ Will produce:
     state: {
         count: 0,
         list: []
-    },
-    actions: {},
-    mutations: {},
-    getters: {},
-    modules: {}
+    }
 }
 ```
 
@@ -315,11 +311,7 @@ Will produce:
             count: 0,
             list: []
         }
-    },
-    actions: {},
-    mutations: {},
-    getters: {},
-    modules: {}
+    }
 }
 ```
 
@@ -338,8 +330,8 @@ Example:
 ```javascript
 vuexUp({
     actions: {
-        addItem({ commit }, id) {
-            commit('add', this.Items.get(id));
+        addItem({ commit }, id, services) {
+            commit('add', services.Items.get(id));
         }
     }
 })
@@ -363,8 +355,8 @@ Example:
 ```javascript
 vuexUp({
     actions: {
-        addItem({ commit }, id) {
-            commit('add', this.Items.get(this.type, id));
+        addItem({ commit }, id, services) {
+            commit('add', services.Items.get(this.type, id));
         }
     }
 })
@@ -405,7 +397,7 @@ counter.mixin({
 
 new Vuex.Store({
     modules: {
-        counter: counter.create();
+        counter: counter.create()
     }
 });
 ```

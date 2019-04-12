@@ -125,8 +125,8 @@ const listModule = vuexUp(baseListModule);
 listModule.mixin({
     namespaced: true,
     actions: {
-        addItem({ commit }, id) {
-            const item = this.Items.get(id);
+        addItem({ commit }, id, services) {
+            const item = services.Items.get(id);
             commit('add', item);
         }
     }
@@ -150,7 +150,7 @@ const store = new Vuex.Store({
 <details>
     <summary>Full code:</summary>
 
-[live example](https://jsfiddle.net/mr_hokid/1u96xscm/1/)
+[live example](https://jsfiddle.net/mr_hokid/1u96xscm/2/)
 
 ```javascript
 import Vue from 'vue';
@@ -175,8 +175,8 @@ const listModule = vuexUp(baseListModule);
 listModule.mixin({
     namespaced: true,
     actions: {
-        addItem({ commit }, id) {
-            const item = this.Items.get(id);
+        addItem({ commit }, id, services) {
+            const item = services.Items.get(id);
             commit('add', item);
         }
     }
