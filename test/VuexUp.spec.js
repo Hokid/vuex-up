@@ -22,6 +22,7 @@ const expectModule = (actual, expected) => {
     expect(actual.namespaced, 'namespaced').to.equal(expected.namespaced);
     expect(actual.modules, 'modules').to.deep.equal(expected.modules);
     methodsContainers.forEach(name => {
+        if (!expected[name]) return;
         Object.keys(expected[name]).forEach(key => {
             expect(actual[name][key], `${name}.${key}`).to.be.a('function');
         });
@@ -30,31 +31,29 @@ const expectModule = (actual, expected) => {
 
 describe('vuex-up', () => {
     describe('.create', () => {
-        it('should return empty module if no base vuexUp provided', () => {
+        it('should return empty module if no base module and no mixins', () => {
             const module = vuexUp();
 
-            expect(module.create()).to.deep
-                .equal(createModule());
+            expect(module.create())
+                .to.deep.equal({});
         });
 
-        it('should keep origin module', () => {
+        it('should keep base module as is if no mixins', () => {
             const module = vuexUp({
                 state: {a: {a: 1}},
                 actions: {a() {}},
-                mutations: {a() {}},
                 getters: {a() {}},
                 modules: {a: {state: 1}}
             });
 
             expectModule(
                 module.create(),
-                createModule({
+                {
                     state: {a: {a: 1}},
                     actions: {a() {}},
-                    mutations: {a() {}},
                     getters: {a() {}},
                     modules: {a: {state: 1}}
-                })
+                }
             );
         });
 
@@ -64,11 +63,11 @@ describe('vuex-up', () => {
             });
             expectModule(
                 module.create(),
-                createModule({
+                {
                     modules: {
-                        a: createModule({state: {a: 1}})
+                        a: {state: {a: 1}}
                     }
-                })
+                }
             )
         });
     });
@@ -82,9 +81,9 @@ describe('vuex-up', () => {
 
             expectModule(
                 module.create(),
-                createModule({
+                {
                     state: {a: 2}
-                })
+                }
             );
         });
 
@@ -96,9 +95,9 @@ describe('vuex-up', () => {
 
             expectModule(
                 module.create(),
-                createModule({
+                {
                     state: {a: {a: 2, b: 1}}
-                })
+                }
             );
         });
 
@@ -111,9 +110,9 @@ describe('vuex-up', () => {
 
             expectModule(
                 module.create(),
-                createModule({
+                {
                     state: {a: {c: 3, b: 1}}
-                })
+                }
             );
         });
 
@@ -125,9 +124,9 @@ describe('vuex-up', () => {
 
             expectModule(
                 module.create(),
-                createModule({
+                {
                     state: {a: {a: 2, b: 1}}
-                })
+                }
             );
         });
 
@@ -139,13 +138,13 @@ describe('vuex-up', () => {
 
             expectModule(
                 module.create(),
-                createModule({
+                {
                     state: {array: [1, 2]}
-                })
+                }
             );
         });
 
-        it('should mix regexp in state as primitives if set deep strategy', () => {
+        it('should mix regexp in state as not mixable valueif set deep strategy', () => {
             const module = vuexUp({
                 state: {r: /^$/}
             })
@@ -153,13 +152,13 @@ describe('vuex-up', () => {
 
             expectModule(
                 module.create(),
-                createModule({
+                {
                     state: {r: /%%/}
-                })
+                }
             );
         });
 
-        it('should mix date in state as primitives if set deep strategy', () => {
+        it('should mix date in state as not mixable value if set deep strategy', () => {
             const a = new Date();
             const b = new Date();
             const module = vuexUp({
@@ -169,10 +168,54 @@ describe('vuex-up', () => {
 
             expectModule(
                 module.create(),
-                createModule({
+                {
                     state: {a: b}
-                })
+                }
             );
+        });
+
+        it('should return state from mixins if no state in base module', () => {
+            const module = vuexUp({})
+                .mixin({
+                    state: 1
+                });
+            expectModule(
+                module.create(),
+                { state: 1 }
+            )
+        });
+
+        it('should return state from mixins if no state in base module', () => {
+            const module = vuexUp({})
+                .mixin({
+                    state: 1
+                });
+            expectModule(
+                module.create(),
+                {state: 1}
+            )
+        });
+
+        it('should return state from mixin if state in base module is not mixable value', () => {
+            const module = vuexUp({ state: 1 })
+                .mixin({
+                    state: {}
+                });
+            expectModule(
+                module.create(),
+                {state: {}}
+            )
+        });
+
+        it('should return state from mixin if state in mixin is not mixable value', () => {
+            const module = vuexUp({state: {}})
+                .mixin({
+                    state: 1
+                });
+            expectModule(
+                module.create(),
+                {state: 1}
+            )
         });
 
         it('should mixing actions', () => {
@@ -188,9 +231,9 @@ describe('vuex-up', () => {
             const result = module.create();
             expectModule(
                 result,
-                createModule({
+                {
                     actions: {a() {}, b() {}}
-                })
+                }
             );
             result.actions.a();
             expect(a).have.been.called;
@@ -209,9 +252,9 @@ describe('vuex-up', () => {
             const result = module.create();
             expectModule(
                 result,
-                createModule({
+                {
                     mutations: {a() {}, b() {}}
-                })
+                }
             );
             result.mutations.a();
             expect(a).have.been.called;
@@ -230,9 +273,9 @@ describe('vuex-up', () => {
             const result = module.create();
             expectModule(
                 result,
-                createModule({
+                {
                     getters: {a() {}, b() {}}
-                })
+                }
             );
             result.getters.a();
             expect(a).have.been.called;
@@ -253,13 +296,13 @@ describe('vuex-up', () => {
                 });
             expectModule(
                 module.create(),
-                createModule({
+                {
                     modules: {
                         a: {state: {a: 1, b: 1}},
                         c: {state: {a: 2}},
                         b: {state: {a: 3}}
                     }
-                })
+                }
             );
         });
     });
@@ -273,9 +316,9 @@ describe('vuex-up', () => {
 
             expectModule(
                 module.create(),
-                createModule({
+                {
                     state: {a: 2}
-                })
+                }
             );
         });
 
@@ -287,9 +330,9 @@ describe('vuex-up', () => {
 
             expectModule(
                 module.create(),
-                createModule({
+                {
                     state: {a: 2}
-                })
+                }
             );
         });
 
@@ -301,9 +344,9 @@ describe('vuex-up', () => {
 
             expectModule(
                 module.create(),
-                createModule({
+                {
                     state: {a: 2}
-                })
+                }
             );
         });
 
@@ -315,9 +358,9 @@ describe('vuex-up', () => {
 
             expectModule(
                 module.create(),
-                createModule({
+                {
                     state: {a: {a: 2, b: 1}}
-                })
+                }
             );
         });
     });
@@ -334,11 +377,11 @@ describe('vuex-up', () => {
             const result = module.create();
             expectModule(
                 result,
-                createModule({
+                {
                     actions: {
                         a() {}
                     }
-                })
+                }
             );
             result.actions.a();
             expect(a).have.been.called;
@@ -353,12 +396,12 @@ describe('vuex-up', () => {
                 .action('b', () => {});
             expectModule(
                 module.create(),
-                createModule({
+                {
                     actions: {
                         a() {},
                         b() {}
                     }
-                })
+                }
             );
         });
     });
@@ -375,11 +418,11 @@ describe('vuex-up', () => {
             const result = module.create();
             expectModule(
                 result,
-                createModule({
+                {
                     actions: {
                         a() {}
                     }
-                })
+                }
             );
             result.actions.a();
             expect(a).have.been.called;
@@ -394,12 +437,12 @@ describe('vuex-up', () => {
                 .actions({b() {}});
             expectModule(
                 module.create(),
-                createModule({
+                {
                     actions: {
                         a() {},
                         b() {}
                     }
-                })
+                }
             );
         });
     });
@@ -416,11 +459,11 @@ describe('vuex-up', () => {
             const result = module.create();
             expectModule(
                 result,
-                createModule({
+                {
                     getters: {
                         a() {}
                     }
-                })
+                }
             );
             result.getters.a();
             expect(a).have.been.called;
@@ -435,12 +478,12 @@ describe('vuex-up', () => {
                 .getter('b', () => {});
             expectModule(
                 module.create(),
-                createModule({
+                {
                     getters: {
                         a() {},
                         b() {}
                     }
-                })
+                }
             );
         });
     });
@@ -457,11 +500,11 @@ describe('vuex-up', () => {
             const result = module.create();
             expectModule(
                 result,
-                createModule({
+                {
                     getters: {
                         a() {}
                     }
-                })
+                }
             );
             result.getters.a();
             expect(a).have.been.called;
@@ -476,12 +519,12 @@ describe('vuex-up', () => {
                 .getters({b() {}});
             expectModule(
                 module.create(),
-                createModule({
+                {
                     getters: {
                         a() {},
                         b() {}
                     }
-                })
+                }
             );
         });
     });
@@ -498,11 +541,11 @@ describe('vuex-up', () => {
             const result = module.create();
             expectModule(
                 result,
-                createModule({
+                {
                     mutations: {
                         a() {}
                     }
-                })
+                }
             );
             result.mutations.a();
             expect(a).have.been.called;
@@ -517,12 +560,12 @@ describe('vuex-up', () => {
                 .mutation('b', () => {});
             expectModule(
                 module.create(),
-                createModule({
+                {
                     mutations: {
                         a() {},
                         b() {}
                     }
-                })
+                }
             );
         });
     });
@@ -539,11 +582,11 @@ describe('vuex-up', () => {
             const result = module.create();
             expectModule(
                 result,
-                createModule({
+                {
                     mutations: {
                         a() {}
                     }
-                })
+                }
             );
             result.mutations.a();
             expect(a).have.been.called;
@@ -558,12 +601,12 @@ describe('vuex-up', () => {
                 .mutations({b() {}});
             expectModule(
                 module.create(),
-                createModule({
+                {
                     mutations: {
                         a() {},
                         b() {}
                     }
-                })
+                }
             );
         });
     });
@@ -578,11 +621,11 @@ describe('vuex-up', () => {
                 .module('a', {state: {b: 1}});
             expectModule(
                 module.create(),
-                createModule({
+                {
                     modules: {
                         a: {state: {b: 1}}
                     }
-                })
+                }
             );
         });
 
@@ -595,12 +638,12 @@ describe('vuex-up', () => {
                 .module('b', {state: {b: 1}});
             expectModule(
                 module.create(),
-                createModule({
+                {
                     modules: {
                         a: {state: {a: 1}},
                         b: {state: {b: 1}}
                     }
-                })
+                }
             );
         });
     });
@@ -615,11 +658,11 @@ describe('vuex-up', () => {
                 .modules({a: {state: {b: 1}}});
             expectModule(
                 module.create(),
-                createModule({
+                {
                     modules: {
                         a: {state: {b: 1}}
                     }
-                })
+                }
             );
         });
 
@@ -632,95 +675,95 @@ describe('vuex-up', () => {
                 .modules({b: {state: {b: 1}}});
             expectModule(
                 module.create(),
-                createModule({
+                {
                     modules: {
                         a: {state: {a: 1}},
                         b: {state: {b: 1}}
                     }
-                })
+                }
             );
         });
     });
 
     describe('.service', () => {
-        it('should provide service to actions', () => {
+        it('should provide service to actions as last argument', () => {
             const serviceA = 1;
             const module = vuexUp({
                 actions: {
-                    a() {
-                        expect(this.serviceA).to.be.equal(serviceA);
+                    a(_, services) {
+                        expect(services.serviceA).to.be.equal(serviceA);
                     }
                 }
             })
                 .service('serviceA', serviceA);
-            module.create().actions.a();
+            module.create().actions.a(void 0);
         });
 
-        it('should provide service to getters', () => {
+        it('should provide service to getters as last argument', () => {
             const serviceA = 1;
             const module = vuexUp({
                 getters: {
-                    a() {
-                        expect(this.serviceA).to.be.equal(serviceA);
+                    a(_, services) {
+                        expect(services.serviceA).to.be.equal(serviceA);
                     }
                 }
             })
                 .service('serviceA', serviceA);
-            module.create().getters.a();
+            module.create().getters.a(void 0);
         });
 
-        it('should provide service to mutations', () => {
+        it('should provide service to mutations as last argument', () => {
             const serviceA = 1;
             const module = vuexUp({
                 mutations: {
-                    a() {
-                        expect(this.serviceA).to.be.equal(serviceA);
+                    a(_, services) {
+                        expect(services.serviceA).to.be.equal(serviceA);
                     }
                 }
             })
                 .service('serviceA', serviceA);
-            module.create().mutations.a();
+            module.create().mutations.a(void 0);
         });
     });
 
     describe('.services', () => {
-        it('should provide services to actions', () => {
+        it('should provide services to actions as last argument', () => {
             const serviceA = 1;
             const module = vuexUp({
                 actions: {
-                    a() {
-                        expect(this.serviceA).to.be.equal(serviceA);
+                    a(_, services) {
+                        expect(services.serviceA).to.be.equal(serviceA);
                     }
                 }
             })
                 .services({serviceA});
-            module.create().actions.a();
+            module.create().actions.a(void 0);
         });
 
-        it('should provide services to getters', () => {
+        it('should provide services to getters as last argument', () => {
             const serviceA = 1;
             const module = vuexUp({
                 getters: {
-                    a() {
-                        expect(this.serviceA).to.be.equal(serviceA);
+                    a(_, services) {
+                        expect(services.serviceA).to.be.equal(serviceA);
                     }
                 }
             })
                 .services({serviceA});
-            module.create().getters.a();
+            module.create().getters.a(void 0);
         });
 
-        it('should provide services to mutations', () => {
+        it('should provide services to mutations as last argument', () => {
             const serviceA = 1;
             const module = vuexUp({
                 mutations: {
-                    a() {
-                        expect(this.serviceA).to.be.equal(serviceA);
+                    a(_, services) {
+                        expect(services.serviceA).to.be.equal(serviceA);
                     }
                 }
             })
                 .services({serviceA});
-            module.create().mutations.a();
+            module.create().mutations.a(void 0);
         });
     });
 });

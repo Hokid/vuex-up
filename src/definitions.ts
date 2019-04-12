@@ -1,98 +1,103 @@
 import {
-    ActionContext,
-    ActionTree as VuexActionTree,
-    GetterTree as VuexGetterTree,
+    ActionContext as VuexActionContext,
     Module as VuexModule,
-    ModuleTree as VuexModuleTree,
-    MutationTree as VuexMutationTree,
     Action as VuexAction,
     Mutation as VuexMutation,
-    Getter as VuexGetter
+    Getter as VuexGetter,
+    Store as VuexStore,
+    ActionHandler as VuexActionHandler
 } from 'vuex';
 
-enum MixingStrategy {
+export enum MixingStrategy {
     shallow,
     deep
 }
 
-interface MixingOptions {
+export interface MixingOptions {
     state: MixingStrategy;
 }
 
-type StateMixingOption = { value: any | (() => any), strategy: MixingStrategy };
+export interface VuexModuleCreator {
+    create<State, RootState>(): VuexModule<State, RootState>;
+}
 
-type VuexUpActionHandler<S, R, Ctx> = (this: Ctx, injectee: ActionContext<S, R>, payload: any) => any;
+export interface AnyServices {
+    [name: string]: any;
+}
 
-interface VuexUpActionObject<S, R, Ctx> {
+export interface VuexUpModuleWithExtractedState<
+    State,
+    RootState,
+    Services extends AnyServices = {}
+>  extends VuexUpModule<State, RootState, Services> {
+    state?: State;
+}
+
+export interface VuexModuleWithExtractedState<State, RootState> extends VuexModule<State, RootState> {
+    state?: State;
+}
+
+export type ModuleKeys = 'state' | 'mutations' | 'actions' | 'getters' | 'modules' | 'namespaced';
+
+export type VuexUpState<State> = State | (() => State);
+
+export type VuexUpActionHandler<State, RootState, Services extends AnyServices = {}> = (
+    this: VuexStore<RootState>,
+    injectee: VuexActionContext<State, RootState>,
+    payload: any,
+    services: Services
+) => any;
+
+export interface VuexUpActionObject<State, RootState, Services extends AnyServices = {}> {
     root?: boolean;
-    handler: VuexUpActionHandler<S, R, Ctx>;
+    handler: VuexUpActionHandler<State, RootState, Services>;
 }
 
-type VuexUpGetter<S, R, Ctx> = (this: Ctx, state: S, getters: any, rootState: R, rootGetters: any) => any;
-type VuexUpAction<S, R, Ctx> = VuexUpActionHandler<S, R, Ctx> | VuexUpActionObject<S, R, Ctx>;
-type VuexUpMutation<S, Ctx> = (this: Ctx, state: S, payload: any) => any;
+export type VuexUpGetter<State, RootState, Services extends AnyServices = {}> = (
+    state: State,
+    getters: any,
+    rootState: RootState,
+    rootGetters: any,
+    services: Services
+) => any;
 
-interface VuexUpModule<S, R, Ctx> {
+export type VuexUpAction<State, RootState, Services extends AnyServices = {}>
+    = VuexUpActionObject<State, RootState, Services>
+    | VuexUpActionHandler<State, RootState, Services>;
+
+export type VuexUpMutation<State, Services extends AnyServices = {}>
+    = (state: State, payload: any, services: Services) => any;
+
+export interface VuexUpModule<State, RootState, Services extends AnyServices = {}> {
     namespaced?: boolean;
-    state?: S | (() => S);
-    getters?: VuexUpGetterTree<S, R, Ctx>;
-    actions?: VuexUpActionTree<S, R, Ctx>;
-    mutations?: VuexUpMutationTree<S, Ctx>;
-    modules?: VuexUpModuleTree<R>;
-}
-
-interface VuexUpModuleResult<S, R, Ctx> extends Required<VuexUpModule<S, R, Ctx>> {
-    state: S;
-    modules: {
-        [key: string]: VuexModule<any, R> | VuexUpModuleResult<any, R, {}>
+    state?: VuexUpState<State>;
+    getters?: {
+        [name: string]: VuexUpGetter<State, RootState, Services>;
+    };
+    actions?: {
+        [name: string]: VuexUpAction<State, RootState, Services>;
+    };
+    mutations?: {
+        [name: string]: VuexUpMutation<State, Services>;
     }
+    modules?: {
+        [name: string]: VuexModule<any, any> | VuexModuleCreator;
+    };
 }
 
-interface VuexUpModuleTree<R> {
-    [key: string]: VuexModule<any, R> | VuexUpCreator<any, R, any> | VuexUpModuleResult<any, R, {}>;
+export interface Tree<T> {
+    [name: string]: T;
 }
 
-interface VuexUpGetterTree<S, R, Ctx> {
-    [key: string]: VuexUpGetter<S, R, Ctx>;
-}
-
-interface VuexUpActionTree<S, R, Ctx> {
-    [key: string]: VuexUpAction<S, R, Ctx>;
-}
-
-interface VuexUpMutationTree<S, Ctx> {
-    [key: string]: VuexUpMutation<S, Ctx>;
-}
-
-interface VuexUpCreator<State, RootState, Services extends { [key: string]: any }> {
-    create<S, R, Sr>(): VuexUpModuleResult<S, R, Sr>;
+export interface VuexUpMixin<State, RootState, Services = {}> {
+    module: VuexUpModule<State, RootState, Services>;
+    options?: MixingOptions;
 }
 
 export {
-    VuexModule,
-    VuexModuleTree,
-    VuexActionTree,
-    VuexMutationTree,
-    VuexGetterTree,
-    VuexMutation,
-    VuexAction,
     VuexGetter,
-
-    MixingStrategy,
-    MixingOptions,
-    StateMixingOption,
-
-    VuexUpCreator,
-
-    VuexUpModule,
-    VuexUpModuleResult,
-
-    VuexUpModuleTree,
-    VuexUpActionTree,
-    VuexUpGetterTree,
-    VuexUpMutationTree,
-
-    VuexUpMutation,
-    VuexUpAction,
-    VuexUpGetter
+    VuexModule,
+    VuexAction,
+    VuexActionHandler,
+    VuexMutation
 }
