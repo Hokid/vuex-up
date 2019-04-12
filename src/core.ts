@@ -23,7 +23,7 @@ const notMixableValueTags = [
     'map'
 ];
 
-function getTag(tag: string, value?: any): string {
+function getTag(value?: any): string {
     return Object.prototype.toString.call(value).slice(8, -1).toLocaleLowerCase();
 }
 
